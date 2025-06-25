@@ -1,81 +1,315 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grepflask v25.062501 (alpha)</title>
+    <title>Grepflask</title>
     <!-- Tailwind CSS CDN for basic styling -->
     <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
     <style>
+        /* Base styles applied to body and container */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
             padding: 2rem;
             box-sizing: border-box;
+            transition: background-color 0.3s ease; /* Smooth transition for background */
         }
         .container {
-            background-color: #ffffff;
             padding: 2.5rem;
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             max-width: 800px;
             width: 100%;
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for container */
         }
         pre {
-            background-color: #e2e8f0;
             padding: 1rem;
             border-radius: 0.5rem;
             white-space: pre-wrap; /* Allows long lines to wrap */
             word-break: break-all; /* Breaks words if necessary */
             max-height: 400px; /* Limit height of results area */
             overflow-y: auto; /* Add scrollbar if content exceeds height */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for pre */
         }
+        input[type="text"] {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        .error-message {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* --- Theme Definitions --- */
+        /* Light Theme (Default) */
+        body {
+            background-color: #f3f4f6;
+        }
+        .container {
+            background-color: #ffffff;
+            color: #1f2937; /* Default text color for light theme */
+        }
+        .container label, .container h1, .container h2 {
+            color: #4b5563; /* Label and heading color */
+        }
+        input[type="text"] {
+            background-color: #ffffff;
+            border-color: #d1d5db;
+            color: #1f2937;
+        }
+        input[type="text"]::placeholder {
+            color: #6b7280;
+        }
+        pre {
+            background-color: #e2e8f0;
+            color: #1f2937;
+        }
+        .error-message {
+            background-color: #fee2e2;
+            border-color: #fca5a5;
+            color: #b91c1c;
+        }
+
+        /* Dark Theme */
+        body.theme-dark {
+            background-color: #1a202c;
+        }
+        body.theme-dark .container {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+        }
+        body.theme-dark .container label, body.theme-dark .container h1, body.theme-dark .container h2 {
+            color: #e2e8f0;
+        }
+        body.theme-dark input[type="text"] {
+            background-color: #4a5568;
+            border-color: #6b7280;
+            color: #e2e8f0;
+        }
+        body.theme-dark input[type="text"]::placeholder {
+            color: #a0aec0;
+        }
+        body.theme-dark pre {
+            background-color: #4a5568;
+            color: #e2e8f0;
+        }
+        body.theme-dark .error-message {
+            background-color: #7f1d1d;
+            border-color: #fca5a5;
+            color: #fca5a5;
+        }
+        body.theme-dark .button-blue {
+            background-color: #4299e1;
+            color: #ffffff;
+        }
+        body.theme-dark .button-blue:hover {
+            background-color: #2b6cb0;
+        }
+
+
+        /* Solarized Light Theme */
+        body.theme-solarized-light {
+            background-color: #fdf6e3; /* base3 */
+        }
+        body.theme-solarized-light .container {
+            background-color: #eee8d5; /* base2 */
+            color: #586e75; /* base01 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        }
+        body.theme-solarized-light .container label, body.theme-solarized-light .container h1, body.theme-solarized-light .container h2 {
+            color: #586e75;
+        }
+        body.theme-solarized-light input[type="text"] {
+            background-color: #eee8d5;
+            border-color: #93a1a1; /* base0 */
+            color: #586e75;
+        }
+        body.theme-solarized-light input[type="text"]::placeholder {
+            color: #839496;
+        }
+        body.theme-solarized-light pre {
+            background-color: #fdf6e3;
+            color: #586e75;
+        }
+        body.theme-solarized-light .error-message {
+            background-color: #dc322f; /* red */
+            border-color: #f5716e;
+            color: #fdf6e3;
+        }
+        body.theme-solarized-light .button-blue {
+            background-color: #2aa198; /* cyan */
+            color: #ffffff;
+        }
+        body.theme-solarized-light .button-blue:hover {
+            background-color: #268bd2; /* blue */
+        }
+
+
+        /* Solarized Dark Theme */
+        body.theme-solarized-dark {
+            background-color: #002b36; /* base03 */
+        }
+        body.theme-solarized-dark .container {
+            background-color: #073642; /* base02 */
+            color: #839496; /* base0 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        body.theme-solarized-dark .container label, body.theme-solarized-dark .container h1, body.theme-solarized-dark .container h2 {
+            color: #839496;
+        }
+        body.theme-solarized-dark input[type="text"] {
+            background-color: #073642;
+            border-color: #586e75; /* base01 */
+            color: #839496;
+        }
+        body.theme-solarized-dark input[type="text"]::placeholder {
+            color: #657b83;
+        }
+        body.theme-solarized-dark pre {
+            background-color: #002b36;
+            color: #839496;
+        }
+        body.theme-solarized-dark .error-message {
+            background-color: #dc322f; /* red */
+            border-color: #f5716e;
+            color: #fdf6e3;
+        }
+        body.theme-solarized-dark .button-blue {
+            background-color: #2aa198; /* cyan */
+            color: #ffffff;
+        }
+        body.theme-solarized-dark .button-blue:hover {
+            background-color: #268bd2; /* blue */
+        }
+
+
+        /* Dracula Theme */
+        body.theme-dracula {
+            background-color: #282a36; /* background */
+        }
+        body.theme-dracula .container {
+            background-color: #44475a; /* current line */
+            color: #f8f8f2; /* foreground */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+        body.theme-dracula .container label, body.theme-dracula .container h1, body.theme-dracula .container h2 {
+            color: #f8f8f2;
+        }
+        body.theme-dracula input[type="text"] {
+            background-color: #6272a4; /* comment */
+            border-color: #bd93f9; /* purple */
+            color: #f8f8f2;
+        }
+        body.theme-dracula input[type="text"]::placeholder {
+            color: #a9b7c6;
+        }
+        body.theme-dracula pre {
+            background-color: #21222c; /* selection */
+            color: #f8f8f2;
+        }
+        body.theme-dracula .error-message {
+            background-color: #ff5555; /* red */
+            border-color: #ff5555;
+            color: #f8f8f2;
+        }
+        body.theme-dracula .button-blue {
+            background-color: #ff79c6; /* pink */
+            color: #ffffff;
+        }
+        body.theme-dracula .button-blue:hover {
+            background-color: #8be9fd; /* cyan */
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Grepflask</h1>
+        <h1 class="text-3xl font-bold mb-6 text-center">Grepflask</h1>
+
+        <div class="mb-4">
+            <label for="theme-select" class="block text-sm font-medium mb-1">Select Theme:</label>
+            <select id="theme-select" class="block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="solarized-light">Solarized Light</option>
+                <option value="solarized-dark">Solarized Dark</option>
+                <option value="dracula">Dracula</option>
+            </select>
+        </div>
 
         <form action="/search" method="post" class="space-y-4">
             <div>
-                <label for="search_term" class="block text-sm font-medium text-gray-700 mb-1">Search Term:</label>
+                <label for="search_term" class="block text-sm font-medium mb-1">Search Term:</label>
                 <input type="text" id="search_term" name="search_term"
                        value="{{ search_term if search_term is not none else '' }}"
-                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                       class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                        placeholder="Enter text to search for" required>
             </div>
             <div>
-                <label for="directory" class="block text-sm font-medium text-gray-700 mb-1">Directory to Search (e.g., `/home/user/my_project` or `.` for current):</label>
+                <label for="directory" class="block text-sm font-medium mb-1">Directory to Search (e.g., `/home/user/my_project` or `.` for current):</label>
                 <input type="text" id="directory" name="directory"
                        value="{{ directory if directory is not none else '.' }}"
-                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                       class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                        placeholder="Enter directory path" required>
             </div>
             <button type="submit"
-                    class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 button-blue">
                 Search
             </button>
         </form>
 
         {% if error %}
-            <div class="mt-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md" role="alert">
+            <div class="mt-6 error-message" role="alert">
                 <p>{{ error }}</p>
             </div>
         {% elif results is not none %}
             <div class="mt-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-3">Search Results:</h2>
+                <h2 class="text-xl font-semibold mb-3">Search Results:</h2>
                 {% if results %}
                     <pre>{{ results }}</pre>
                 {% else %}
-                    <p class="text-gray-600">No matches found.</p>
+                    <p>No matches found.</p>
                 {% endif %}
             </div>
         {% endif %}
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeSelect = document.getElementById('theme-select');
+            const body = document.body;
+
+            // Function to apply a theme
+            function applyTheme(themeName) {
+                // Remove all existing theme classes from the body
+                body.className = body.className.split(' ').filter(c => !c.startsWith('theme-')).join(' ');
+
+                // Add the new theme class if it's not 'light' (default)
+                if (themeName !== 'light') {
+                    body.classList.add(`theme-${themeName}`);
+                }
+                
+                // Save the selected theme to localStorage
+                localStorage.setItem('selectedTheme', themeName);
+            }
+
+            // Load theme from localStorage on page load
+            const savedTheme = localStorage.getItem('selectedTheme') || 'light'; // Default to light
+            applyTheme(savedTheme);
+            themeSelect.value = savedTheme; // Set the dropdown to the saved theme
+
+            // Event listener for theme selection change
+            themeSelect.addEventListener('change', (event) => {
+                const newTheme = event.target.value;
+                applyTheme(newTheme);
+            });
+        });
+    </script>
 </body>
 </html>
-
